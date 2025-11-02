@@ -1,19 +1,25 @@
 {
-    "name": "@zest-pw/playwright",
+    "name": "@zest-pw/test",
     "version": "1.0.0",
     "description": "Advanced Playwright test framework with automatic screenshots, custom reporting, and Zephyr Scale integration",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "files": [
       "dist",
+      "scripts",
       "README.md",
       "LICENSE"
     ],
+    "bin": {
+      "zest-pw-init": "./scripts/install-config.js"
+    },
     "scripts": {
       "build": "tsc",
       "test": "playwright test",
       "prepublishOnly": "npm run build",
-      "type-check": "tsc --noEmit"
+      "type-check": "tsc --noEmit",
+      "postinstall": "node scripts/install-config.js",
+      "install": "node scripts/install-config.js"
     },
     "keywords": [
       "playwright",
