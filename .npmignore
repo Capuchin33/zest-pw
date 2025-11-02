@@ -1,0 +1,45 @@
+# Source files
+*.ts
+!*.d.ts
+
+# Config files
+tsconfig.json
+.eslintrc*
+.prettierrc*
+
+# Environment
+.env
+.env.*
+
+# Test files
+**/*.spec.ts
+**/*.test.ts
+test-results/
+screenshots/
+
+# Build artifacts
+node_modules/
+*.log
+*.tgz
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# Documentation drafts
+*.draft.md
+
+# OS
+.DS_Store
+Thumbs.db
+
