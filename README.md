@@ -13,35 +13,63 @@ Advanced Playwright test framework with automatic screenshots, custom reporting,
 
 ## 🚀 Quick Start
 
-### 1. Install Dependencies
+### 1. Install the Package
 
 ```bash
-npm install
+npm install --save-dev @zest-pw/test
 ```
 
-### 2. Create Configuration
+### 2. Configuration
 
-Create a `zest.config.ts` file in your project root:
+The configuration file `zest.config.ts` will be automatically created in your project root after installation. If it wasn't created automatically, run:
+
+```bash
+npx zest-pw-init
+```
+
+The default configuration:
 
 ```typescript
-import { defineZestConfig } from './zest-pw/config';
+import { defineZestConfig } from '@zest-pw/test';
 
 export default defineZestConfig({
   reporter: {
     saveJsonReport: true,
     printToConsole: true,
+    outputDir: 'test-results',
   },
   screenshots: {
     enabled: true,
     includeInReport: true,
+    onlyOnFailure: false,
+  },
+  zephyr: {
+    enabled: false,
+    updateResults: false,
   },
 });
 ```
 
-### 3. Write Your First Test
+### 3. Configure Playwright
+
+Update your `playwright.config.ts`:
 
 ```typescript
-import { test, expect } from '../zest-pw/fixtures/fixtures'
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  reporter: [
+    ['list'],
+    ['@zest-pw/test/reporter'], // Add Zest reporter
+  ],
+  // ... other Playwright config
+});
+```
+
+### 4. Write Your First Test
+
+```typescript
+import { test, expect } from '@zest-pw/test';
 
 test('TC-001: Check the title', async ({ page }) => {
   
@@ -55,20 +83,20 @@ test('TC-001: Check the title', async ({ page }) => {
 });
 ```
 
-### 4. Run Tests
+### 5. Run Tests
 
 ```bash
-npm test
+npx playwright test
 ```
 
 ## ⚙️ Configuration
 
 ### Configuration File
 
-Create `zest.config.ts` in your project root to customize framework behavior:
+The `zest.config.ts` file is automatically created when you install the package. You can customize it as needed:
 
 ```typescript
-import { defineZestConfig } from './zest-pw/config';
+import { defineZestConfig } from '@zest-pw/test';
 
 export default defineZestConfig({
   reporter: {
@@ -199,33 +227,18 @@ zephyr: {
 ## 🛠️ Project Structure
 
 ```
-test-playwright/
-├── tests/                  # Test files
+your-project/
+├── node_modules/
+│   └── @zest-pw/
+│       └── test/          # Installed package
+├── tests/                 # Test files
 │   ├── TC-001.spec.ts
 │   └── TC-002.spec.ts
-├── zest-pw/               # Zest Framework
-│   ├── config.ts          # Configuration system
-│   ├── index.ts           # Main exports
-│   ├── fixtures/          # Custom fixtures with auto-screenshots
-│   │   └── fixtures.ts
-│   ├── reporter/          # Custom reporter
-│   │   ├── custom-reporter.ts
-│   │   ├── result-processor.ts
-│   │   └── test-results-store.ts
-│   ├── utils/             # Utilities
-│   │   ├── test-result-transformer.ts
-│   │   ├── enrich-test-results.ts
-│   │   ├── add-file-names.ts
-│   │   ├── save-json-report.ts
-│   │   └── terminal-reporter.ts
-│   └── zephyr-api/        # Zephyr integration
-│       ├── zephyr-api.ts
-│       ├── get-results-from-json.ts
-│       └── update-execution-result.ts
 ├── test-results/          # Test results
 │   └── test-results.json
-├── zest.config.ts         # Zest configuration
-└── playwright.config.ts   # Playwright configuration
+├── zest.config.ts         # Zest configuration (auto-created)
+├── playwright.config.ts   # Playwright configuration
+└── package.json
 ```
 
 ## 📝 Writing Tests
@@ -233,7 +246,7 @@ test-playwright/
 ### Basic Test Structure
 
 ```typescript
-import { test, expect } from '../zest-pw/fixtures/fixtures'
+import { test, expect } from '@zest-pw/test';
 
 test('TC-001: Test description', async ({ page }) => {
   
@@ -268,20 +281,23 @@ tests/
 ## 💡 Commands
 
 ```bash
+# Initialize configuration (if not created automatically)
+npx zest-pw-init
+
 # Run all tests
-npm test
+npx playwright test
 
 # Run specific test
-npm test -- tests/TC-001.spec.ts
+npx playwright test tests/TC-001.spec.ts
 
 # Run in headed mode
-npm test -- --headed
+npx playwright test --headed
 
 # Run in debug mode
-npm test -- --debug
+npx playwright test --debug
 
 # Run with UI
-npm test -- --ui
+npx playwright test --ui
 
 # Generate Playwright report
 npx playwright show-report
@@ -312,7 +328,7 @@ export default defineZestConfig({
 ### Accessing Configuration in Code
 
 ```typescript
-import { getZestConfig } from './zest-pw/config';
+import { getZestConfig } from '@zest-pw/test';
 
 const config = getZestConfig();
 console.log('Screenshots enabled:', config.screenshots.enabled);
@@ -321,7 +337,7 @@ console.log('Screenshots enabled:', config.screenshots.enabled);
 ### Programmatic Configuration
 
 ```typescript
-import { defineZestConfig } from './zest-pw/config';
+import { defineZestConfig } from '@zest-pw/test';
 
 export default defineZestConfig({
   reporter: {
@@ -332,6 +348,16 @@ export default defineZestConfig({
 ```
 
 ## 🐛 Troubleshooting
+
+### Configuration file not created automatically
+
+If `zest.config.ts` wasn't created after installation, run:
+
+```bash
+npx zest-pw-init
+```
+
+Or create it manually using the template from the Configuration section.
 
 ### Screenshots not appearing in report
 
@@ -357,6 +383,18 @@ Ensure configuration allows saving:
 reporter: {
   saveJsonReport: true,
 }
+```
+
+### Import errors
+
+Make sure you're importing from the installed package:
+
+```typescript
+// ✅ Correct
+import { test, expect, defineZestConfig } from '@zest-pw/test';
+
+// ❌ Incorrect (old local paths)
+import { test, expect } from './zest-pw/fixtures/fixtures';
 ```
 
 ## 📚 Documentation
