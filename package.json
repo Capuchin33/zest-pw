@@ -1,0 +1,56 @@
+{
+    "name": "@zest-pw/playwright",
+    "version": "1.0.0",
+    "description": "Advanced Playwright test framework with automatic screenshots, custom reporting, and Zephyr Scale integration",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "files": [
+      "dist",
+      "README.md",
+      "LICENSE"
+    ],
+    "scripts": {
+      "build": "tsc",
+      "test": "playwright test",
+      "prepublishOnly": "npm run build",
+      "type-check": "tsc --noEmit"
+    },
+    "keywords": [
+      "playwright",
+      "testing",
+      "automation",
+      "zephyr",
+      "zephyr-scale",
+      "screenshots",
+      "test-framework",
+      "test-reporter",
+      "e2e",
+      "end-to-end"
+    ],
+    "author": "",
+    "license": "MIT",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/Capuchin33/zest-pw.git"
+    },
+    "homepage": "https://github.com/Capuchin33/zest-pw#readme",
+    "bugs": {
+      "url": "https://github.com/Capuchin33/zest-pw/issues"
+    },
+    "engines": {
+      "node": ">=16.0.0"
+    },
+    "peerDependencies": {
+      "@playwright/test": "^1.40.0"
+    },
+    "peerDependenciesMeta": {
+      "@playwright/test": {
+        "optional": false
+      }
+    },
+    "devDependencies": {
+      "@playwright/test": "^1.40.0",
+      "@types/node": "^20.0.0",
+      "typescript": "^5.0.0"
+    }
+  }
