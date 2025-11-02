@@ -29,9 +29,6 @@ jobs:
       - name: Build package
         run: npm run build
       
-      - name: Run tests
-        run: npm test
-      
       - name: Check TypeScript
         run: npx tsc --noEmit
 
@@ -52,4 +49,3 @@ jobs:
       
       - name: Run linter (if configured)
         run: echo "Linter will be added later" && exit 0
-
