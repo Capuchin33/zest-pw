@@ -18,7 +18,7 @@
       "LICENSE"
     ],
     "bin": {
-      "zest-pw-init": "./scripts/install-config.js"
+      "zest-pw-init": "scripts/install-config.js"
     },
     "scripts": {
       "build": "tsc",
@@ -44,7 +44,7 @@
     "license": "MIT",
     "repository": {
       "type": "git",
-      "url": "https://github.com/Capuchin33/zest-pw.git"
+      "url": "git+https://github.com/Capuchin33/zest-pw.git"
     },
     "homepage": "https://github.com/Capuchin33/zest-pw#readme",
     "bugs": {
