@@ -4,6 +4,13 @@
     "description": "Advanced Playwright test framework with automatic screenshots, custom reporting, and Zephyr Scale integration",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
+    "exports": {
+      ".": {
+        "default": "./dist/index.js",
+        "types": "./dist/index.d.ts"
+      },
+      "./reporter": "./dist/reporter/custom-reporter.js"
+    },
     "files": [
       "dist",
       "scripts",
