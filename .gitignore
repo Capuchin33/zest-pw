@@ -45,3 +45,9 @@ Thumbs.db
 !package.json
 !tsconfig.json
 !tsconfig.*.json
+
+# Playwright
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
