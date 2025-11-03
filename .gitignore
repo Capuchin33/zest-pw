@@ -13,6 +13,11 @@ dist/
 .env.local
 .env.*.local
 
+# Test files and config
+tests/
+playwright.config.ts
+zest.config.ts
+
 # Test results
 test-results/
 playwright-report/

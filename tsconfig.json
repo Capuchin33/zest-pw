@@ -20,16 +20,20 @@
       "noFallthroughCasesInSwitch": true
     },
     "include": [
+      "*.ts",
       "**/*.ts"
     ],
     "exclude": [
       "node_modules",
       "dist",
+      "tests",
       "test-results",
       "screenshots",
       "playwright-report",
       "**/*.spec.ts",
       "**/*.test.ts",
-      ".github"
+      ".github",
+      "playwright.config.ts",
+      "zest.config.ts"
     ]
   }
