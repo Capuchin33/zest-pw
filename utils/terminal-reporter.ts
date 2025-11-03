@@ -1,5 +1,6 @@
 import * as path from 'path';
 import { saveBase64Screenshot } from './save-screenshots';
+import { getZestConfig } from '../config';
 
 /**
  * Форматує та виводить результати тестів після їх завершення
@@ -96,8 +97,11 @@ function printStepAttachments(step: any, testTitle: string, outputDir: string | 
       console.log(`         ${att.body}`);
     }
     
-    // Зберігаємо скріншот на диск, якщо встановлена змінна оточення
-    if (att.body && process.env.SAVE_SCREENSHOTS === 'true' && att.image === 'image/png') {
+    // Зберігаємо скріншот на диск, якщо увімкнено в конфігурації або через змінну оточення
+    const config = getZestConfig();
+    const shouldSaveScreenshots = config.screenshots.saveToDisk || process.env.SAVE_SCREENSHOTS === 'true';
+    
+    if (att.body && shouldSaveScreenshots && att.image === 'image/png') {
       try {
         // Використовуємо fileName з actualResult
         const filename = att.fileName;

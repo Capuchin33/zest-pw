@@ -57,6 +57,12 @@ export interface ZestConfig {
      * @default false
      */
     onlyOnFailure?: boolean;
+
+    /**
+     * Save screenshots to disk as files
+     * @default false
+     */
+    saveToDisk?: boolean;
   };
 
   /**
@@ -106,6 +112,7 @@ export const defaultConfig: Required<ZestConfig> = {
     enabled: true,
     includeInReport: true,
     onlyOnFailure: false,
+    saveToDisk: false,
   },
   zephyr: {
     enabled: false,

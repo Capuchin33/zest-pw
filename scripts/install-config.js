@@ -34,6 +34,8 @@ export default defineZestConfig({
     includeInReport: true,
     // Capture screenshots only on failure
     onlyOnFailure: false,
+    // Save screenshots to disk as files
+    saveToDisk: false,
   },
   zephyr: {
     // Enable Zephyr Scale integration
