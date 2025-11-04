@@ -26,7 +26,7 @@ npm install --save-dev @zest-pw/test
 
 ### 2. Configuration
 
-Create the configuration file `zest.config.ts` in your project root manually.
+The configuration file `zest.config.ts` will be automatically created in your project root after installation.
 
 The default configuration:
 
@@ -171,13 +171,14 @@ Test results are automatically saved to `test-results/test-results.json`:
 {
   "tests": [
     {
+      "projectName": "chromium",
       "testTitle": "Check the title",
       "testCaseKey": "TC-001",
       "steps": [
         {
           "stepTitle": "Go to the playwright website",
           "actualResult": [...],
-          "statusName": "passed"
+          "statusName": "pass"
         }
       ]
     }
@@ -349,7 +350,7 @@ export default defineZestConfig({
 
 ### Configuration file setup
 
-Create `zest.config.ts` manually in your project root using the template from the Configuration section.
+The `zest.config.ts` file is automatically created when you install the package. If it wasn't created, you can create it manually using the template from the Configuration section.
 
 ### Screenshots not appearing in report
 
