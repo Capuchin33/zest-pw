@@ -36,7 +36,7 @@ export async function getResultsFromJson() {
     }
     
     const processedResults = testResults.tests.reduce((acc: Record<string, any>, test: any) => {
-        const { testTitle, testCaseKey, ...testData } = test;
+        const { projectName,testTitle, testCaseKey, ...testData } = test;
         acc[testCaseKey] = {
             ...testData,
             steps: test.steps.map(({ stepTitle, ...step }: any) => step)
