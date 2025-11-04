@@ -54,7 +54,7 @@ function printTestSteps(executedCount: number, allSteps: any[], testTitle: strin
   console.log(`  Steps (${executedCount}/${totalCount}):`);
 
   allSteps.forEach((step: any, stepIndex: number) => {
-    const statusEmoji = step.statusName === 'passed' ? 'passed - ✅' : step.statusName === 'failed' ? 'failed - ❌' : step.statusName === 'In Progress' ? 'skipped - ⏭️' : '⏱️';
+    const statusEmoji = step.statusName === 'pass' ? 'passed - ✅' : step.statusName === 'failed' ? 'fail - ❌' : step.statusName === 'In Progress' ? 'skipped - ⏭️' : '⏱️';
     console.log(`    ${stepIndex + 1}. ${step.stepTitle}`);
     
     if (step.error) {

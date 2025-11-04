@@ -82,13 +82,13 @@ function transformStep(step: any): any {
  * Determines step status
  * 
  * @param step - Step object from test execution
- * @returns Step status ('failed' if has error, otherwise step.status or 'passed')
+ * @returns Step status ('fail' if has error, otherwise 'pass')
  */
 function determineStepStatus(step: any): string {
   if (step.error) {
-    return 'failed';
+    return 'fail';
   }
-  return step.status || 'passed';
+  return 'pass';
 }
 
 /**
