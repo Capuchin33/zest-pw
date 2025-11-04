@@ -2,11 +2,9 @@ import type { TestInfo, TestType, Page } from '@playwright/test';
 import { takeScreenshotAfterStep } from './take-screenshots';
 
 /**
- * Застосовує обгортку до test.step для автоматичного створення скріншотів
- * після кожного кроку тесту
- * 
- * @param test - Об'єкт test з Playwright
- * @param getCurrentContext - Функція для отримання поточного контексту тесту
+ * Wraps test.step to automatically create screenshots after each test step
+ * @param test - Playwright test object
+ * @param getCurrentContext - Function to get current test context (testInfo and page)
  */
 export function wrapTestStepWithScreenshots(
   test: TestType<any, any>,
@@ -22,10 +20,8 @@ export function wrapTestStepWithScreenshots(
   ): Promise<T> {
     return originalTestStep(title, async (stepInfo: any) => {
       try {
-        // Виконуємо крок
         const result = await body(stepInfo);
         
-        // Робимо скріншот після успішного виконання кроку
         const context = getCurrentContext();
         if (context?.page && context?.testInfo) {
           await takeScreenshotAfterStep(context.page, stepInfo, context.testInfo, title);
@@ -33,13 +29,12 @@ export function wrapTestStepWithScreenshots(
         
         return result;
       } catch (error) {
-        // Якщо крок падає, все одно робимо скріншот
         const context = getCurrentContext();
         if (context?.page && context?.testInfo) {
           try {
             await takeScreenshotAfterStep(context.page, { ...stepInfo, error }, context.testInfo, title);
           } catch (screenshotError) {
-            console.error('Помилка при створенні скріншота після помилки кроку:', screenshotError);
+            console.error('Error taking screenshot after step error:', screenshotError);
           }
         }
         throw error;
@@ -47,12 +42,10 @@ export function wrapTestStepWithScreenshots(
     }, options);
   };
 
-  // Додаємо метод skip, якщо він існує
   if (originalTestStepSkip) {
     (stepWrapper as any).skip = originalTestStepSkip;
   }
 
-  // Замінюємо оригінальний test.step на обгортку
   test.step = stepWrapper as any;
 }
 

@@ -2,8 +2,10 @@ import * as path from 'path';
 import { parsePlannedStepsFromFile } from './parse-test-steps';
 
 /**
- * Збагачує результати тестів запланованими кроками з файлів
- * Додає кроки які не були виконані (наприклад після падіння тесту)
+ * Enriches test results with planned steps from files
+ * Adds steps that were not executed (e.g., after test failure)
+ * @param results - Test results object containing tests array
+ * @returns Enriched test results with planned steps included
  */
 export function enrichTestResultsWithPlannedSteps(results: any): any {
   if (!results.tests || !Array.isArray(results.tests)) {
@@ -17,14 +19,15 @@ export function enrichTestResultsWithPlannedSteps(results: any): any {
 }
 
 /**
- * Збагачує один тест запланованими кроками
+ * Enriches a single test with planned steps
+ * @param test - Test object containing steps and file path
+ * @returns Test object with enriched steps
  */
 function enrichTestWithPlannedSteps(test: any): any {
   const userSteps = filterUserSteps(test.steps || []);
   const plannedSteps = getPlannedSteps(test);
   const allSteps = combineSteps(userSteps, plannedSteps);
 
-  // Видаляємо _fullPath перед поверненням (використовувався тільки для getPlannedSteps)
   const { _fullPath, ...testWithoutFullPath } = test;
 
   return {
@@ -34,7 +37,9 @@ function enrichTestWithPlannedSteps(test: any): any {
 }
 
 /**
- * Фільтрує тільки користувацькі кроки (приховує системні хуки)
+ * Filters only user-defined steps (hides system hooks)
+ * @param steps - Array of test steps
+ * @returns Filtered array containing only user steps
  */
 function filterUserSteps(steps: any[]): any[] {
   return steps.filter((step: any) => {
@@ -57,10 +62,11 @@ function filterUserSteps(steps: any[]): any[] {
 }
 
 /**
- * Отримує заплановані кроки з файлу тесту
+ * Gets planned steps from test file
+ * @param test - Test object containing _fullPath property
+ * @returns Array of planned step titles
  */
 function getPlannedSteps(test: any): string[] {
-  // Використовуємо _fullPath який створюється в transformTestCase
   const fullPath = test._fullPath;
   if (!fullPath) {
     return [];
@@ -74,7 +80,10 @@ function getPlannedSteps(test: any): string[] {
 }
 
 /**
- * Об'єднує виконані та невиконані кроки
+ * Combines executed and unexecuted steps
+ * @param executedSteps - Array of executed step objects
+ * @param plannedSteps - Array of planned step titles
+ * @returns Combined array with executed steps and unexecuted steps marked as 'In Progress'
  */
 function combineSteps(executedSteps: any[], plannedSteps: string[]): any[] {
   const executedStepTitles = executedSteps.map((step: any) => step.stepTitle);

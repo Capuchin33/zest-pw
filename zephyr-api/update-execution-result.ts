@@ -5,6 +5,10 @@ import {
     putTestExecution 
 } from './zephyr-api';
 
+/**
+ * Updates test execution results in Zephyr Scale
+ * Reads test results from JSON file and updates each test case in Zephyr
+ */
 export async function updateTestResult() {
     console.log('Updating test result in Zephyr...');
     
@@ -14,7 +18,6 @@ export async function updateTestResult() {
         return;
     }
     
-    // Iterate over object with testCaseKey as keys
     for (const testCaseKey in testResults) {
         const steps = testResults[testCaseKey];
         const testCaseId = await getTestCaseId(testCaseKey);

@@ -1,16 +1,15 @@
 import * as fs from 'fs';
 
 /**
- * Парсить заплановані кроки тесту з файлу
- * @param filePath - Шлях до файлу тесту
- * @param testTitle - Назва тесту
- * @returns Масив назв запланованих кроків
+ * Parses planned test steps from file
+ * @param filePath - Path to test file
+ * @param testTitle - Test title
+ * @returns Array of planned step titles
  */
 export function parsePlannedStepsFromFile(filePath: string, testTitle: string): string[] {
   const steps: string[] = [];
   
   try {
-    // Перевіряємо, чи файл існує
     if (!fs.existsSync(filePath)) {
       return steps;
     }
@@ -23,19 +22,16 @@ export function parsePlannedStepsFromFile(filePath: string, testTitle: string): 
     let braceCount = 0;
     let testStartLine = -1;
     
-    // Регулярні вирази для пошуку тестів та кроків
     const testTitleRegex = /\btest(\.only|\.skip|\.fixme)?\s*\(\s*(["'`])([^"'`]+)\2\s*,/;
     const stepRegex = /\b(?:test|await\s+test)\.step\s*\(\s*(["'`])([^"'`]+)\1\s*,/;
     
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       
-      // Перевіряємо, чи це початок нового тесту
       const testMatch = line.match(testTitleRegex);
       if (testMatch) {
         const foundTitle = testMatch[3];
         
-        // Якщо ми були всередині іншого тесту, скидаємо стан
         if (insideTargetTest && foundTitle !== testTitle) {
           insideTargetTest = false;
           braceCount = 0;
@@ -47,7 +43,6 @@ export function parsePlannedStepsFromFile(filePath: string, testTitle: string): 
           steps.length = 0;
           testStartLine = i;
           braceCount = 0;
-          // Починаємо рахувати відкриваючі дужки
           const openBraces = (line.match(/\{/g) || []).length;
           const closeBraces = (line.match(/\}/g) || []).length;
           braceCount += openBraces - closeBraces;
@@ -58,14 +53,11 @@ export function parsePlannedStepsFromFile(filePath: string, testTitle: string): 
         }
       }
       
-      // Якщо ми знаходимось всередині потрібного тесту, шукаємо кроки
       if (insideTargetTest && currentTestTitle === testTitle) {
-        // Рахуємо дужки для визначення меж тесту
         const openBraces = (line.match(/\{/g) || []).length;
         const closeBraces = (line.match(/\}/g) || []).length;
         braceCount += openBraces - closeBraces;
         
-        // Якщо дужки закрилися, тест закінчився
         if (braceCount <= 0 && i > testStartLine) {
           break;
         }
@@ -77,8 +69,7 @@ export function parsePlannedStepsFromFile(filePath: string, testTitle: string): 
       }
     }
   } catch (error) {
-    // Мовчки ігноруємо помилки парсингу
-    console.error(`Помилка парсингу файлу ${filePath}:`, error);
+    console.error(`Error parsing file ${filePath}:`, error);
   }
   
   return steps;

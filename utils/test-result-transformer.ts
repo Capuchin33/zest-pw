@@ -25,27 +25,12 @@ export function transformTestResults(
  */
 function transformTestCase(test: TestCase, result: TestResult): any {
   return {
+    projectName: test.parent.parent.title || 'chromium',
     testTitle: test.title,
-    testCaseKey: transformLocation(test.location),
+    testCaseKey: test.parent.title.split('.')[0],
     _fullPath: test.location?.file,  // Used in enrich-test-results.ts to find planned test steps
     steps: result.steps?.map(step => transformStep(step)) || []
   };
-}
-
-/**
- * Transforms test location information - returns file name as testCaseKey
- * 
- * @param location - Location object containing file path information
- * @returns Test case key (file name without .spec.ts extension) or undefined
- */
-function transformLocation(location: any): string | undefined {
-  if (!location || !location.file) {
-    return undefined;
-  }
-
-  // Extract only the file name from the full path and remove .spec.ts extension
-  const fileName = location.file.split('/').pop();
-  return fileName?.replace('.spec.ts', '');
 }
 
 /**

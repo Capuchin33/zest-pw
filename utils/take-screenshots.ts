@@ -1,15 +1,20 @@
 /**
- * Утиліта для створення скріншотів після кроків тесту
+ * Utility for creating screenshots after test steps
  */
 
 import type { Page, TestInfo } from "@playwright/test";
 
 /**
- * Робить скріншот після кожного кроку тесту (завжди, незалежно від результату)
+ * Takes a screenshot after each test step (always, regardless of result)
  * 
- * Для збереження скріншотів на диск (з base64 результатів):
- * 1. Додайте в .env файл: SAVE_SCREENSHOTS=true
- * 2. Або передайте через команду: SAVE_SCREENSHOTS=true npx playwright test
+ * To save screenshots to disk (from base64 results):
+ * 1. Add to .env file: SAVE_SCREENSHOTS=true
+ * 2. Or pass via command: SAVE_SCREENSHOTS=true npx playwright test
+ * 
+ * @param page - Playwright Page object
+ * @param stepInfo - Step information object
+ * @param testInfo - Playwright TestInfo object for attaching screenshots
+ * @param stepTitle - Optional step title for attachment name
  */
 export async function takeScreenshotAfterStep(
   page: Page,
@@ -19,23 +24,17 @@ export async function takeScreenshotAfterStep(
 ): Promise<void> {
   try {
     if (page && testInfo) {
-      // Робимо скріншот без збереження на диск (тільки в буфер)
       const screenshotBuffer = await page.screenshot({ 
         fullPage: true 
       });
       
-      // Додаємо скріншот як attachment через testInfo
-      // Attachment автоматично прикріплюється до поточного кроку як substep
       await testInfo.attach(stepTitle || stepInfo?.title || 'screenshot', {
         body: screenshotBuffer,
         contentType: 'image/png',
       });
-      
-      // Примітка: Збереження на диск відбувається в terminal-reporter.ts (якщо PRINT_TEST_RESULTS=true)
-      // або можна зберегти з JSON звіту вручну
     }
   } catch (error) {
-    console.error('Помилка при створенні скріншота кроку:', error);
+    console.error('Error taking step screenshot:', error);
   }
 }
 

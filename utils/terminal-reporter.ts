@@ -3,47 +3,46 @@ import { saveBase64Screenshot } from './save-screenshots';
 import { getZestConfig } from '../config';
 
 /**
- * Форматує та виводить результати тестів після їх завершення
- * Вивід контролюється через змінну оточення PRINT_TEST_RESULTS
- * 
- * Очікує що result вже збагачений запланованими кроками через enrichTestResultsWithPlannedSteps
+ * Formats and prints test results after completion
+ * Expects result to be enriched with planned steps via enrichTestResultsWithPlannedSteps
+ * @param result - Test results object containing tests array with steps information
  */
 export function printTestResults(result: any): void {
 
   if (!result.tests || !Array.isArray(result.tests)) {
     return;
   }
-
-  console.log('\n=== Деталі по тестах та їх кроках ===');
   
   result.tests.forEach((test: any) => {
     printTestInfo(test);
     
-    // test.steps вже містить всі кроки (виконані + заплановані) після enrichTestResultsWithPlannedSteps
     const allSteps = test.steps || [];
     const executedSteps = allSteps.filter((step: any) => step.statusName !== 'In Progress');
     
-    // Створюємо outputDir точно як Playwright: test-results/{filename}-{test-title}-{project}
-    // test.testCaseKey тепер без розширення (наприклад "TC-002")
     const testFileName = test.testCaseKey || 'test';
     const sanitizedTitle = test.testTitle.replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-|-$/g, '');
-    const outputDir = path.join('test-results', `${testFileName}-${sanitizedTitle}-chromium`);
+    const projectName = test.projectName || 'chromium';
+    const outputDir = path.join('test-results', `${testFileName}-${sanitizedTitle}-${projectName}`);
     
     printTestSteps(executedSteps.length, allSteps, test.testTitle, outputDir);
   });
 
-  console.log('\n=== Фінальне завершення ===');
 }
 
 /**
- * Виводить загальну інформацію про тест
+ * Prints general test information
+ * @param test - Test object containing testCaseKey and testTitle
  */
 function printTestInfo(test: any): void {
   console.log(`\n${test.testCaseKey}: ${test.testTitle}`);
 }
 
 /**
- * Виводить інформацію про кроки тесту
+ * Prints test step information
+ * @param executedCount - Number of executed steps
+ * @param allSteps - Array of all steps (executed and planned)
+ * @param testTitle - Title of the test
+ * @param outputDir - Optional output directory path for saving screenshots
  */
 function printTestSteps(executedCount: number, allSteps: any[], testTitle: string, outputDir?: string): void {
   if (allSteps.length === 0) {
@@ -58,7 +57,6 @@ function printTestSteps(executedCount: number, allSteps: any[], testTitle: strin
     const statusEmoji = step.statusName === 'passed' ? 'passed - ✅' : step.statusName === 'failed' ? 'failed - ❌' : step.statusName === 'In Progress' ? 'skipped - ⏭️' : '⏱️';
     console.log(`    ${stepIndex + 1}. ${step.stepTitle}`);
     
-    // Спочатку показуємо помилку, якщо є
     if (step.error) {
       console.log(`       ❌ Error: ${step.error.message}`);
       if (step.error.stack) {
@@ -70,13 +68,16 @@ function printTestSteps(executedCount: number, allSteps: any[], testTitle: strin
     printStepAttachments(step, testTitle, outputDir, stepIndex + 1);
     console.log(`       Status: ${statusEmoji}`);
     
-    // Додаємо порожній рядок після кожного кроку для кращої читабельності
     console.log('');
   });
 }
 
 /**
- * Виводить actualResult кроку
+ * Prints step attachments (screenshots, etc.)
+ * @param step - Step object containing actualResult with attachments
+ * @param testTitle - Title of the test
+ * @param outputDir - Optional output directory path for saving screenshots
+ * @param _stepNumber - Step number (unused, kept for compatibility)
  */
 function printStepAttachments(step: any, testTitle: string, outputDir: string | undefined, _stepNumber: number): void {
   if (!step.actualResult || step.actualResult.length === 0) {
@@ -88,30 +89,23 @@ function printStepAttachments(step: any, testTitle: string, outputDir: string | 
     const isErrorScreenshot = att.fileName?.includes('ERROR');
     const emoji = isErrorScreenshot ? '💥' : att.image === 'image/png' ? '📸' : '📄';
     
-    // Для консолі виводимо "Decode: Base64"
     const displayName = att.image === 'image/png' ? 'Decode: Base64' : att.fileName;
     console.log(`         ${emoji} ${displayName}`);
     
     if (att.body && att.image === 'text/plain') {
-      // Для текстових actualResult виводимо повний текст
       console.log(`         ${att.body}`);
     }
     
-    // Зберігаємо скріншот на диск, якщо увімкнено в конфігурації або через змінну оточення
     const config = getZestConfig();
     const shouldSaveScreenshots = config.screenshots.saveToDisk || process.env.SAVE_SCREENSHOTS === 'true';
     
     if (att.body && shouldSaveScreenshots && att.image === 'image/png') {
       try {
-        // Використовуємо fileName з actualResult
         const filename = att.fileName;
         
-        // Використовуємо outputDir від Playwright або fallback на screenshots/
         if (outputDir) {
-          // Зберігаємо в папку тесту, яку створив Playwright
           saveBase64Screenshot(att.body, filename, outputDir);
         } else {
-          // Fallback: зберігаємо в screenshots/ з підпапкою тесту
           saveBase64Screenshot(att.body, filename, 'screenshots', testTitle);
         }
         

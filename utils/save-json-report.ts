@@ -18,22 +18,14 @@ import * as path from 'path';
  */
 export function saveTestResultsToJson(result: any, outputDir: string = 'test-results'): string {
   try {
-    // Build the full path to the results directory
     const resultsPath = path.join(process.cwd(), outputDir);
     
-    // Create directory if it doesn't exist (recursive: true creates parent dirs too)
     if (!fs.existsSync(resultsPath)) {
       fs.mkdirSync(resultsPath, { recursive: true });
     }
 
-    // Define the output filename
     const filename = `test-results.json`;
-    
-    // Build the full file path
     const filepath = path.join(resultsPath, filename);
-
-    // Convert object to JSON string with pretty formatting (2 space indentation)
-    // and save to file with UTF-8 encoding
     fs.writeFileSync(filepath, JSON.stringify(result, null, 2), 'utf-8');
     
     return filepath;

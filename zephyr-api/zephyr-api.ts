@@ -1,4 +1,7 @@
-// Common headers for all requests
+/**
+ * Gets common headers for all Zephyr API requests
+ * @returns Headers object with Content-Type and Authorization
+ */
 const getHeaders = () => {
     return {
         'Content-Type': 'application/json',
@@ -19,7 +22,6 @@ export async function getTestCaseId(testCaseKey: string) {
                 headers: getHeaders(),
             }
         );
-        // Return only ID
         const data = await response.json() as { id: string };
         const id = data.id;
         console.log('------------------------------------------');
@@ -46,7 +48,6 @@ export async function getTestExecutionKey(testCaseId: string) {
             }
         );
 
-        // Find object in array by testCase.id
         const data = await response.json() as { values: Array<{ key: string; testCase: { id: string } }> };
         const testExecution = data.values.find((execution: { testCase: { id: string } }) =>
             execution.testCase.id === testCaseId
@@ -67,9 +68,10 @@ export async function getTestExecutionKey(testCaseId: string) {
 }
 
 /**
- * Puts test execution in Zephyr
+ * Updates test execution steps in Zephyr
  * @param testExecutionKey - Test execution key
  * @param steps - Array of test steps to update
+ * @throws Error if request fails
  */
 export async function putTestExecution(testExecutionKey: string, steps: string[]) {
     try {
@@ -89,8 +91,6 @@ export async function putTestExecution(testExecutionKey: string, steps: string[]
         console.log('Successfully sent test steps to Zephyr ✅');
         console.log('------------------------------------------');
 
-
-        // Add 3 second pause after updating steps
         console.log('Waiting 3 seconds before continuing... ⏳');
         await new Promise(resolve => setTimeout(resolve, 3000));
     }

@@ -1,27 +1,31 @@
 import * as fs from 'fs';
-import * as path from 'path'
+import * as path from 'path';
 
-
-// Допоміжна функція для читання результатів тестів
+/**
+ * Helper function to read test results from JSON file
+ * @returns Test results object or null if file doesn't exist
+ */
 function readTestResults() {
-    // Шлях до файлу з результатами тестів
     const testResultsPath = path.join(process.cwd(), 'test-results', 'test-results.json');
     
-    // Перевіряємо, чи існує файл
     if (!fs.existsSync(testResultsPath)) {
         console.error('Test results file not found:', testResultsPath);
         return null;
     }
     
-    // Читаємо та парсимо JSON файл
     const testResultsContent = fs.readFileSync(testResultsPath, 'utf-8');
     const testResults = JSON.parse(testResultsContent);
     
     return testResults;
 }
 
+/**
+ * Gets test results from JSON file and processes them for Zephyr
+ * Excludes testTitle and testCaseKey from each test, stepTitle from each step,
+ * and transforms tests array into an object with testCaseKey as keys
+ * @returns Processed test results object with testCaseKey as keys, or null if no results found
+ */
 export async function getResultsFromJson() {
-
     console.log('Getting results for Zephyr...');
     
     const testResults = readTestResults();
@@ -31,8 +35,6 @@ export async function getResultsFromJson() {
         return null;
     }
     
-    // Виключаємо testTitle та testCaseKey з кожного тесту, stepTitle з кожного кроку
-    // та перетворюємо масив тестів в об'єкт з ключами testCaseKey
     const processedResults = testResults.tests.reduce((acc: Record<string, any>, test: any) => {
         const { testTitle, testCaseKey, ...testData } = test;
         acc[testCaseKey] = {
