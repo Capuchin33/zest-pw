@@ -13,20 +13,13 @@
   },
   "files": [
     "dist",
-    "scripts",
     "README.md",
     "LICENSE"
   ],
-  "bin": {
-    "zest-pw-init": "scripts/install-config.js"
-  },
   "scripts": {
     "build": "tsc",
-    "test": "playwright test",
     "prepublishOnly": "npm run build",
-    "type-check": "tsc --noEmit",
-    "postinstall": "node scripts/install-config.js",
-    "install": "node scripts/install-config.js"
+    "type-check": "tsc --noEmit"
   },
   "keywords": [
     "playwright",
@@ -51,18 +44,10 @@
     "url": "https://github.com/Capuchin33/zest-pw/issues"
   },
   "engines": {
-    "node": ">=16.0.0"
-  },
-  "peerDependencies": {
-    "@playwright/test": "^1.40.0"
-  },
-  "peerDependenciesMeta": {
-    "@playwright/test": {
-      "optional": false
-    }
+    "node": ">=18.0.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.56.1",
+    "@playwright/test": "^1.40.0",
     "@types/node": "^20.0.0",
     "typescript": "^5.0.0"
   }

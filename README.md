@@ -13,6 +13,11 @@ Advanced Playwright test framework with automatic screenshots, custom reporting,
 
 ## 🚀 Quick Start
 
+### Requirements
+
+- Node.js >= 18.0.0
+- Playwright (peer dependency)
+
 ### 1. Install the Package
 
 ```bash
@@ -21,11 +26,7 @@ npm install --save-dev @zest-pw/test
 
 ### 2. Configuration
 
-The configuration file `zest.config.ts` will be automatically created in your project root after installation. If it wasn't created automatically, run:
-
-```bash
-npx zest-pw-init
-```
+Create the configuration file `zest.config.ts` in your project root manually.
 
 The default configuration:
 
@@ -281,9 +282,6 @@ tests/
 ## 💡 Commands
 
 ```bash
-# Initialize configuration (if not created automatically)
-npx zest-pw-init
-
 # Run all tests
 npx playwright test
 
@@ -349,15 +347,9 @@ export default defineZestConfig({
 
 ## 🐛 Troubleshooting
 
-### Configuration file not created automatically
+### Configuration file setup
 
-If `zest.config.ts` wasn't created after installation, run:
-
-```bash
-npx zest-pw-init
-```
-
-Or create it manually using the template from the Configuration section.
+Create `zest.config.ts` manually in your project root using the template from the Configuration section.
 
 ### Screenshots not appearing in report
 
