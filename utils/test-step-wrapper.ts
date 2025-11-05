@@ -1,4 +1,4 @@
-import type { TestInfo, TestType, Page } from '@playwright/test';
+import type { TestInfo, Page, TestStepInfo, test as base, Location } from '@playwright/test';
 import { takeScreenshotAfterStep } from './take-screenshots';
 
 /**
@@ -7,45 +7,42 @@ import { takeScreenshotAfterStep } from './take-screenshots';
  * @param getCurrentContext - Function to get current test context (testInfo and page)
  */
 export function wrapTestStepWithScreenshots(
-  test: TestType<any, any>,
+  test: typeof base,
   getCurrentContext: () => { testInfo: TestInfo; page: Page } | null
 ): void {
-  const originalTestStep = test.step.bind(test);
-  const originalTestStepSkip = (test.step as any).skip?.bind(test);
+  const originalTestStep: typeof test.step = test.step.bind(test);
+  const originalTestStepSkip = test.step.skip.bind(test);
 
-  const stepWrapper = async function<T>(
+  const takeScreenshot = async (title: string) => {
+    const context = getCurrentContext();
+    try {
+      await takeScreenshotAfterStep(context.page, context.testInfo, title);
+    } catch (screenshotError) {
+      console.error('Error taking screenshot after step error:', screenshotError);
+    }
+  }
+
+  const stepWrapper: typeof test.step = async function<T>(
     title: string,
-    body: (stepInfo: any) => Promise<T> | T,
-    options?: { box?: boolean; timeout?: number }
+    body: (stepInfo: TestStepInfo) => Promise<T> | T,
+    options?: { box?: boolean; location?: Location; timeout?: number }
   ): Promise<T> {
-    return originalTestStep(title, async (stepInfo: any) => {
+    return originalTestStep(title, async (stepInfo: TestStepInfo) => {
       try {
         const result = await body(stepInfo);
-        
-        const context = getCurrentContext();
-        if (context?.page && context?.testInfo) {
-          await takeScreenshotAfterStep(context.page, stepInfo, context.testInfo, title);
-        }
-        
+        await takeScreenshot(title);
         return result;
       } catch (error) {
-        const context = getCurrentContext();
-        if (context?.page && context?.testInfo) {
-          try {
-            await takeScreenshotAfterStep(context.page, { ...stepInfo, error }, context.testInfo, title);
-          } catch (screenshotError) {
-            console.error('Error taking screenshot after step error:', screenshotError);
-          }
-        }
+        await takeScreenshot(title);
         throw error;
       }
     }, options);
   };
 
   if (originalTestStepSkip) {
-    (stepWrapper as any).skip = originalTestStepSkip;
+    stepWrapper.skip = originalTestStepSkip;
   }
 
-  test.step = stepWrapper as any;
+  test.step = stepWrapper;
 }
 

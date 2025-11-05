@@ -18,17 +18,14 @@ import type { Page, TestInfo } from "@playwright/test";
  */
 export async function takeScreenshotAfterStep(
   page: Page,
-  stepInfo: any,
   testInfo: TestInfo,
   stepTitle?: string
 ): Promise<void> {
   try {
     if (page && testInfo) {
-      const screenshotBuffer = await page.screenshot({ 
-        fullPage: true 
-      });
+      const screenshotBuffer = await page.screenshot({ fullPage: true });
       
-      await testInfo.attach(stepTitle || stepInfo?.title || 'screenshot', {
+      await testInfo.attach(stepTitle || 'screenshot', {
         body: screenshotBuffer,
         contentType: 'image/png',
       });
@@ -37,4 +34,3 @@ export async function takeScreenshotAfterStep(
     console.error('Error taking step screenshot:', error);
   }
 }
-
