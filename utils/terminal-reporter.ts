@@ -46,29 +46,29 @@ function printTestInfo(test: any): void {
  */
 function printTestSteps(executedCount: number, allSteps: any[], testTitle: string, outputDir?: string): void {
   if (allSteps.length === 0) {
-    console.log('  Steps: none');
+    console.log('Steps: none');
     return;
   }
 
   const totalCount = allSteps.length;
-  console.log(`  Steps (${executedCount}/${totalCount}):`);
+  console.log(`Steps (${executedCount}/${totalCount}):`);
 
   allSteps.forEach((step: any, stepIndex: number) => {
-    const statusEmoji = step.statusName === 'pass' ? 'passed - ✅' : step.statusName === 'failed' ? 'fail - ❌' : step.statusName === 'In Progress' ? 'skipped - ⏭️' : '⏱️';
-    console.log(`    ${stepIndex + 1}. ${step.stepTitle}`);
-    
-    if (step.error) {
-      console.log(`       ❌ Error: ${step.error.message}`);
-      if (step.error.stack) {
-        const stackLines = step.error.stack.split('\n').slice(0, 3);
-        stackLines.forEach((line: string) => console.log(`          ${line}`));
-      }
-    }
+    const statusEmoji = step.statusName === 'pass' ? 'passed - ✅' : step.statusName === 'fail' ? 'failed - ❌' : step.statusName === 'In Progress' ? 'skipped - ⏭️' : '⏱️';
+    console.log(`${stepIndex + 1}. ${step.stepTitle}`);
+    console.log('');
     
     printStepAttachments(step, testTitle, outputDir, stepIndex + 1);
-    console.log(`       Status: ${statusEmoji}`);
-    
-    console.log('');
+    console.log(`Status: ${statusEmoji}`);
+
+    if (step.error) {
+      const stackLines = step.error.message.split('\n').slice(0, 4);
+      const separator = '─'.repeat(65);
+      console.log(`${separator}`);
+      stackLines.forEach((line: string) => console.log(`${line}`));
+      console.log(`${separator}`);
+    }
+
   });
 }
 
@@ -84,16 +84,16 @@ function printStepAttachments(step: any, testTitle: string, outputDir: string | 
     return;
   }
 
-  console.log(`       Screenshot:`);
+  console.log(`Screenshot:`);
   step.actualResult.forEach((att: any) => {
     const isErrorScreenshot = att.fileName?.includes('ERROR');
     const emoji = isErrorScreenshot ? '💥' : att.image === 'image/png' ? '📸' : '📄';
     
     const displayName = att.image === 'image/png' ? 'Decode: Base64' : att.fileName;
-    console.log(`         ${emoji} ${displayName}`);
+    console.log(`${emoji} ${displayName}`);
     
     if (att.body && att.image === 'text/plain') {
-      console.log(`         ${att.body}`);
+      console.log(`${att.body}`);
     }
     
     const config = getZestConfig();
@@ -109,10 +109,12 @@ function printStepAttachments(step: any, testTitle: string, outputDir: string | 
           saveBase64Screenshot(att.body, filename, 'screenshots', testTitle);
         }
         
-        console.log(`         💾 File saved: locally`);
-        console.log(`         📄 File name: ${filename}`);
+        console.log(`💾 File saved: locally`);
+        console.log(`📄 File name: ${filename}`);
+        console.log('');
       } catch (error) {
-        console.error(`         ⚠️  Error saving screenshot: ${error}`);
+        console.error(`⚠️  Error saving screenshot: ${error}`);
+        console.log('');
       }
     }
   });
