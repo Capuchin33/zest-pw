@@ -13,9 +13,7 @@ export function printTestResults(result: any): void {
     return;
   }
   
-  result.tests.forEach((test: any) => {
-    printTestInfo(test);
-    
+  result.tests.forEach((test: any) => {    
     const allSteps = test.steps || [];
     const executedSteps = allSteps.filter((step: any) => step.statusName !== 'In Progress');
     
@@ -23,8 +21,12 @@ export function printTestResults(result: any): void {
     const sanitizedTitle = test.testTitle.replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-|-$/g, '');
     const projectName = test.projectName || 'chromium';
     const outputDir = path.join('test-results', `${testFileName}-${sanitizedTitle}-${projectName}`);
-    
+    console.log('');
+    console.log('');
+    console.log(`\x1b[30m––––––––––––––––––––––––––––––––––\x1b[0m ${test.testCaseKey} \x1b[30m––––––––––––––––––––––––––––––––––\x1b[0m`);
+    printTestInfo(test);
     printTestSteps(executedSteps.length, allSteps, test.testTitle, outputDir);
+    console.log('');
   });
 
 }
@@ -34,7 +36,7 @@ export function printTestResults(result: any): void {
  * @param test - Test object containing testCaseKey and testTitle
  */
 function printTestInfo(test: any): void {
-  console.log(`\n${test.testCaseKey}: ${test.testTitle}`);
+  console.log(`\n\x1b[30mTEST CASE:\x1b[0m ${test.testTitle}`);
 }
 
 /**
@@ -45,31 +47,31 @@ function printTestInfo(test: any): void {
  * @param outputDir - Optional output directory path for saving screenshots
  */
 function printTestSteps(executedCount: number, allSteps: any[], testTitle: string, outputDir?: string): void {
-  if (allSteps.length === 0) {
-    console.log('Steps: none');
-    return;
-  }
 
   const totalCount = allSteps.length;
-  console.log(`Steps (${executedCount}/${totalCount}):`);
-
+  console.log('');
   allSteps.forEach((step: any, stepIndex: number) => {
-    const statusEmoji = step.statusName === 'pass' ? 'passed - ✅' : step.statusName === 'fail' ? 'failed - ❌' : step.statusName === 'In Progress' ? 'skipped - ⏭️' : '⏱️';
-    console.log(`${stepIndex + 1}. ${step.stepTitle}`);
-    console.log('');
-    
+    const statusEmoji = step.statusName === 'pass' ? '\x1b[32mPASSED ✓\x1b[0m' : step.statusName === 'fail' ? '\x1b[31mFAILED ✗\x1b[0m' : step.statusName === 'In Progress' ? '\x1b[30mSKIPPED ⊘\x1b[0m' : '⏱️';
+    if (step.error) {
+        console.log('\x1b[31m- - - - - - - - - - - - -  ERROR  - - - - - - - - - - - - -\x1b[0m');
+        console.log('');
+    }    
+    console.log(`\x1b[30mTest Step ${stepIndex + 1}:\x1b[0m ${step.stepTitle}`);
     printStepAttachments(step, testTitle, outputDir, stepIndex + 1);
-    console.log(`Status: ${statusEmoji}`);
-
+    console.log('');
+    console.log(`\x1b[30mstatus:\x1b[0m ${statusEmoji}\x1b[0m`);
+    console.log('');
     if (step.error) {
       const stackLines = step.error.message.split('\n').slice(0, 4);
-      const separator = '─'.repeat(65);
-      console.log(`${separator}`);
       stackLines.forEach((line: string) => console.log(`${line}`));
-      console.log(`${separator}`);
-    }
-
+      console.log('');
+      console.log('\x1b[31m- - - - - - - - - - - - -  ERROR  - - - - - - - - - - - - -\x1b[0m');
+      console.log('');
+  }
   });
+  console.log('');
+  console.log(`\x1b[30mTotal results:\x1b[0m \x1b[32m${executedCount} passed,\x1b[0m \x1b[31m${totalCount - executedCount} failed\x1b[0m`);
+  console.log('');
 }
 
 /**
@@ -84,13 +86,13 @@ function printStepAttachments(step: any, testTitle: string, outputDir: string | 
     return;
   }
 
-  console.log(`Screenshot:`);
+  console.log(`\x1b[30mScreenshot:\x1b[0m`);
   step.actualResult.forEach((att: any) => {
     const isErrorScreenshot = att.fileName?.includes('ERROR');
     const emoji = isErrorScreenshot ? '💥' : att.image === 'image/png' ? '📸' : '📄';
     
-    const displayName = att.image === 'image/png' ? 'Decode: Base64' : att.fileName;
-    console.log(`${emoji} ${displayName}`);
+    const displayName = att.image === 'image/png' ? '\x1b[30mDecode:\x1b[0m Base64' : att.fileName;
+    console.log(`   ${emoji} ${displayName}`);
     
     if (att.body && att.image === 'text/plain') {
       console.log(`${att.body}`);
@@ -109,12 +111,10 @@ function printStepAttachments(step: any, testTitle: string, outputDir: string | 
           saveBase64Screenshot(att.body, filename, 'screenshots', testTitle);
         }
         
-        console.log(`💾 File saved: locally`);
-        console.log(`📄 File name: ${filename}`);
-        console.log('');
+        console.log(`   \x1b[30m💾 File saved:\x1b[0m locally`);
+        console.log(`   \x1b[30m📄 File name:\x1b[0m ${filename}`);
       } catch (error) {
-        console.error(`⚠️  Error saving screenshot: ${error}`);
-        console.log('');
+        console.error(`   ⚠️  Error saving screenshot: ${error}`);
       }
     }
   });
