@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { getZestConfig } from '../config';
 
 /**
  * Decodes base64 string to Buffer
@@ -42,3 +43,28 @@ export function saveBase64Screenshot(
   return filepath;
 }
 
+export function saveScreenshotToDisk(result: any): void {
+  result.tests.forEach((test) => {
+      const allSteps = test.steps || [];
+      const testFileName = test.testCaseKey || 'test';
+      const sanitizedTitle = test.testTitle.replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-|-$/g, '');
+      const projectName = test.projectName || 'chromium';
+      const outputDir = path.join('test-results', `${testFileName}-${sanitizedTitle}-${projectName}`);
+
+      const actualResult = allSteps.map((test) => test.actualResult);
+
+      actualResult.forEach((att) => {
+          try {
+          const filename = att[0].fileName;
+          const body = att[0].body;
+              if (outputDir) {
+                  saveBase64Screenshot(body, filename, outputDir);
+              } else {
+                  saveBase64Screenshot(body, filename,);
+              }
+          } catch (error) {
+              console.error(`   ⚠️  Error saving screenshot: ${error}`);
+          }
+      });
+  });
+}

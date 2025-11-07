@@ -15,8 +15,6 @@ export function printTestResults(result: any): void {
   
   result.tests.forEach((test: any) => {    
     const allSteps = test.steps || [];
-    const executedSteps = allSteps.filter((step: any) => step.statusName !== 'In Progress');
-    
     const testFileName = test.testCaseKey || 'test';
     const sanitizedTitle = test.testTitle.replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-|-$/g, '');
     const projectName = test.projectName || 'chromium';
@@ -25,7 +23,7 @@ export function printTestResults(result: any): void {
     const remainder = (63 - testTitle.length) < 0 ? 0 : (63 - testTitle.length);
     const spaces = '\x1b[40m \x1b[0m'.repeat(remainder);
     console.log(`\n\x1b[40m${testTitle}${spaces}\x1b[0m`);
-    printTestSteps(executedSteps.length, allSteps, test.testTitle, outputDir);
+    printTestSteps(allSteps, test.testTitle, outputDir);
   });
 
   let passedCount = 0;
@@ -50,12 +48,11 @@ export function printTestResults(result: any): void {
 
 /**
  * Prints test step information
- * @param executedCount - Number of executed steps
  * @param allSteps - Array of all steps (executed and planned)
  * @param testTitle - Title of the test
  * @param outputDir - Optional output directory path for saving screenshots
  */
-function printTestSteps(executedCount: number, allSteps: any[], testTitle: string, outputDir?: string): void {
+function printTestSteps(allSteps: any[], testTitle: string, outputDir?: string): void {
   console.log('');
   allSteps.forEach((step: any, stepIndex: number) => {
     if (step.statusName === 'In Progress') {
@@ -97,29 +94,16 @@ function printStepAttachments(step: any, testTitle: string, outputDir: string | 
 
   console.log(`\x1b[30mscreenshot:\x1b[0m`);
   step.actualResult.forEach((att: any) => {
-    const isErrorScreenshot = att.fileName?.includes('ERROR');
-    const emoji = isErrorScreenshot ? '💥' : att.image === 'image/png' ? '📸' : '📄';
-    
     const displayName = att.image === 'image/png' ? '\x1b[30m-decode:\x1b[0m Base64' : att.fileName;
     console.log(`    ${displayName}`);
-    
-    if (att.body && att.image === 'text/plain') {
-      console.log(`${att.body}`);
-    }
-    
+        
     const config = getZestConfig();
     const shouldSaveScreenshots = config.screenshots.saveToDisk || process.env.SAVE_SCREENSHOTS === 'true';
     
-    if (att.body && shouldSaveScreenshots && att.image === 'image/png') {
+    if (att.body && shouldSaveScreenshots) {
       try {
         const filename = att.fileName;
-        
-        if (outputDir) {
-          saveBase64Screenshot(att.body, filename, outputDir);
-        } else {
-          saveBase64Screenshot(att.body, filename, 'screenshots', testTitle);
-        }
-        
+
         console.log(`   \x1b[30m -saved:\x1b[0m Locally`);
         console.log(`   \x1b[30m -name:\x1b[0m ${filename}`);
       } catch (error) {

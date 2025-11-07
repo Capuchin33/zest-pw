@@ -2,6 +2,7 @@ import type { FullResult, TestCase, TestResult } from '@playwright/test/reporter
 import { printTestResults } from '../utils/terminal-reporter';
 import { transformTestResults } from '../utils/test-result-transformer';
 import { saveTestResultsToJson } from '../utils/save-json-report';
+import { saveScreenshotToDisk } from '../utils/save-screenshots';
 import { enrichTestResultsWithPlannedSteps } from '../utils/enrich-test-results';
 import { addFileNamesToResults } from '../utils/add-file-names';
 import { updateTestResult } from '../zephyr-api/update-execution-result';
@@ -43,6 +44,15 @@ export async function processTestResults(
       printTestResults(finalResults);
     } catch (error) {
       console.error('Error printing test results:', error);
+    }
+  }
+
+  // Save screenshots to disk if enabled
+  if (config.screenshots.saveToDisk) {
+    try {
+      saveScreenshotToDisk(finalResults);
+    } catch (error) {
+      console.error('Error saving screenshots to disk:', error);
     }
   }
 
