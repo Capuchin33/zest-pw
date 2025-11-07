@@ -43,6 +43,10 @@ export function saveBase64Screenshot(
   return filepath;
 }
 
+/**
+ * Saves all screenshots from test results to disk
+ * @param result - Test results object containing tests array with steps and actualResult attachments
+ */
 export function saveScreenshotToDisk(result: any): void {
   result.tests.forEach((test) => {
       const allSteps = test.steps || [];
