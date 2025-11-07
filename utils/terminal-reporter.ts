@@ -21,9 +21,10 @@ export function printTestResults(result: any): void {
     const sanitizedTitle = test.testTitle.replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-|-$/g, '');
     const projectName = test.projectName || 'chromium';
     const outputDir = path.join('test-results', `${testFileName}-${sanitizedTitle}-${projectName}`);
-    console.log('\n');
-    console.log(`\x1b[30m––––––––––––––––––––––––––––––––––\x1b[0m ${test.testCaseKey} \x1b[30m––––––––––––––––––––––––––––––––––\x1b[0m`);
-    printTestInfo(test);
+    const testTitle = `${projectName} › ${testFileName} › ${test.testTitle}`
+    const remainder = (63 - testTitle.length) < 0 ? 0 : (63 - testTitle.length);
+    const spaces = '\x1b[40m \x1b[0m'.repeat(remainder);
+    console.log(`\n\x1b[40m${testTitle}${spaces}\x1b[0m`);
     printTestSteps(executedSteps.length, allSteps, test.testTitle, outputDir);
   });
 
@@ -33,25 +34,18 @@ export function printTestResults(result: any): void {
 
   result.tests.forEach((test) => {
       for (const step of test.steps) {
-          if (step.statusName === 'pass') {
-              passedCount++;
-          } else if (step.statusName === 'fail') {
-              failedCount++;
-          } else if (step.statusName === 'In Progress') {
-              skippedCount++;
-          }
+        switch (step.statusName) {
+          case 'pass': passedCount++; 
+          break;
+          case 'fail': failedCount++; 
+          break;
+          case 'In Progress': skippedCount++; 
+          break;
+        }
       }
   });
   console.log(`\x1b[30mTotal results:\x1b[0m \x1b[32m${passedCount} passed\x1b[0m\x1b[30m,\x1b[0m \x1b[31m${failedCount} failed\x1b[0m\x1b[30m,\x1b[0m \x1b[30m${skippedCount} skipped\x1b[0m`);
   console.log('\n');
-}
-
-/**
- * Prints general test information
- * @param test - Test object containing testCaseKey and testTitle
- */
-function printTestInfo(test: any): void {
-  console.log(`\n\x1b[30mTEST CASE:\x1b[0m ${test.testTitle}`);
 }
 
 /**
@@ -64,25 +58,31 @@ function printTestInfo(test: any): void {
 function printTestSteps(executedCount: number, allSteps: any[], testTitle: string, outputDir?: string): void {
   console.log('');
   allSteps.forEach((step: any, stepIndex: number) => {
+    if (step.statusName === 'In Progress') {
+      return;
+    }
+    let stepTitle: string;
+    switch (step.statusName) {
+        case 'fail': stepTitle = `\x1b[31m ${step.stepTitle}\x1b[0m`;
+        break;
+        default: stepTitle = step.stepTitle;
+        break;
+    }
     const statusEmoji = step.statusName === 'pass' ? '\x1b[32mPASSED ✓\x1b[0m' : step.statusName === 'fail' ? '\x1b[31mFAILED ✗\x1b[0m' : step.statusName === 'In Progress' ? '\x1b[30mSKIPPED ⊘\x1b[0m' : '⏱️';
-    if (step.error) {
-        console.log('\x1b[31m- - - - - - - - - - - - -  ERROR  - - - - - - - - - - - - -\x1b[0m');
-        console.log('');
-    }    
-    console.log(`\x1b[30mTest Step ${stepIndex + 1}:\x1b[0m ${step.stepTitle}`);
+    console.log(`\x1b[30mSTEP ${stepIndex + 1}:\x1b[0m ${stepTitle}`);
     printStepAttachments(step, testTitle, outputDir, stepIndex + 1);
-    console.log('');
-    console.log(`\x1b[30mstatus:\x1b[0m ${statusEmoji}\x1b[0m`);
     if (step.error) {
       const stackLines = step.error.message.split('\n').slice(0, 4);
-      stackLines.forEach((line: string) => console.log(`${line}`));
-      console.log('');
-      console.log('\x1b[31m- - - - - - - - - - - - -  ERROR  - - - - - - - - - - - - -\x1b[0m');
-      console.log('');
-  }
+      console.log('\n\n\x1b[41m                             ERROR                             \x1b[0m\n');
+      stackLines.forEach((line) => console.log(`${line}`));
+      console.log('\n\x1b[41m                             ERROR                             \x1b[0m\n\n');
+    };
+    if (!step.error) {
+    console.log(`\n\x1b[30mstatus:\x1b[0m ${statusEmoji}\x1b[0m`);
+    console.log('\x1b[30m‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾\x1b[0m\n\n');
+    };
   });
 }
-
 /**
  * Prints step attachments (screenshots, etc.)
  * @param step - Step object containing actualResult with attachments
@@ -95,13 +95,13 @@ function printStepAttachments(step: any, testTitle: string, outputDir: string | 
     return;
   }
 
-  console.log(`   \x1b[30mScreenshot:\x1b[0m`);
+  console.log(`\x1b[30mscreenshot:\x1b[0m`);
   step.actualResult.forEach((att: any) => {
     const isErrorScreenshot = att.fileName?.includes('ERROR');
     const emoji = isErrorScreenshot ? '💥' : att.image === 'image/png' ? '📸' : '📄';
     
     const displayName = att.image === 'image/png' ? '\x1b[30mDecode:\x1b[0m Base64' : att.fileName;
-    console.log(`      ${emoji} ${displayName}`);
+    console.log(`   ${emoji} ${displayName}`);
     
     if (att.body && att.image === 'text/plain') {
       console.log(`${att.body}`);
@@ -120,10 +120,10 @@ function printStepAttachments(step: any, testTitle: string, outputDir: string | 
           saveBase64Screenshot(att.body, filename, 'screenshots', testTitle);
         }
         
-        console.log(`      \x1b[30m💾 File saved:\x1b[0m locally`);
-        console.log(`      \x1b[30m📄 File name:\x1b[0m ${filename}`);
+        console.log(`   \x1b[30m💾 saved:\x1b[0m Locally`);
+        console.log(`   \x1b[30m📄 name:\x1b[0m ${filename}`);
       } catch (error) {
-        console.error(`      ⚠️  Error saving screenshot: ${error}`);
+        console.error(`   ⚠️  Error saving screenshot: ${error}`);
       }
     }
   });
