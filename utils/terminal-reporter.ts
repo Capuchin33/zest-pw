@@ -63,7 +63,7 @@ function printTestSteps(executedCount: number, allSteps: any[], testTitle: strin
     }
     let stepTitle: string;
     switch (step.statusName) {
-        case 'fail': stepTitle = `\x1b[31m ${step.stepTitle}\x1b[0m`;
+        case 'fail': stepTitle = `\x1b[31m${step.stepTitle}\x1b[0m`;
         break;
         default: stepTitle = step.stepTitle;
         break;
@@ -100,8 +100,8 @@ function printStepAttachments(step: any, testTitle: string, outputDir: string | 
     const isErrorScreenshot = att.fileName?.includes('ERROR');
     const emoji = isErrorScreenshot ? '💥' : att.image === 'image/png' ? '📸' : '📄';
     
-    const displayName = att.image === 'image/png' ? '\x1b[30mDecode:\x1b[0m Base64' : att.fileName;
-    console.log(`   ${emoji} ${displayName}`);
+    const displayName = att.image === 'image/png' ? '\x1b[30m-decode:\x1b[0m Base64' : att.fileName;
+    console.log(`    ${displayName}`);
     
     if (att.body && att.image === 'text/plain') {
       console.log(`${att.body}`);
@@ -120,8 +120,8 @@ function printStepAttachments(step: any, testTitle: string, outputDir: string | 
           saveBase64Screenshot(att.body, filename, 'screenshots', testTitle);
         }
         
-        console.log(`   \x1b[30m💾 saved:\x1b[0m Locally`);
-        console.log(`   \x1b[30m📄 name:\x1b[0m ${filename}`);
+        console.log(`   \x1b[30m -saved:\x1b[0m Locally`);
+        console.log(`   \x1b[30m -name:\x1b[0m ${filename}`);
       } catch (error) {
         console.error(`   ⚠️  Error saving screenshot: ${error}`);
       }
