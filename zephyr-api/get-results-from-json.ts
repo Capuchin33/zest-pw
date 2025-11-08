@@ -35,14 +35,25 @@ export async function getResultsFromJson() {
         return null;
     }
     
-    const processedResults = testResults.tests.reduce((acc: Record<string, any>, test: any) => {
+    const processedResults = testResults.tests.reduce((acc, test) => {
         const { projectName, testTitle, testCaseKey, ...testData } = test;
         acc[testCaseKey] = {
             ...testData,
-            steps: test.steps.map(({ stepTitle, ...step }: any) => step)
+            steps: test.steps.map(({ stepTitle, actualResult, ...step }) => {
+                let processedActualResult = actualResult;
+                if (actualResult && Array.isArray(actualResult)) {
+                    processedActualResult = actualResult.map(item => {
+                        return `<img src="data:${item.image || ''};base64,${item.body || ''}" alt="${item.fileName || ''}">`;
+                    }).join('');
+                }
+                return {
+                    actualResult: processedActualResult,
+                    ...step
+                };
+            })
         };
         return acc;
-    }, {} as Record<string, any>);
+    }, {});
     
     return processedResults;
 }
