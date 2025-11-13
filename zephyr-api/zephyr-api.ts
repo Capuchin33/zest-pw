@@ -75,9 +75,7 @@ export async function getTestExecutionKey(testCaseId: string) {
  */
 export async function putTestExecution(testExecutionKey: string, steps: string[]) {
     try {
-        const body = {
-            steps: steps
-        };
+        const body = steps;
 
         await fetch(
             process.env.ZEPHYR_API_URL + 'testexecutions/' + testExecutionKey + '/teststeps',
