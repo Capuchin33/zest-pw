@@ -53,6 +53,8 @@ export async function getResultsFromJson() {
                     const errorMessage = cleanMessage.split('\n').map(line => line.trimStart()).join('<br>');
                     const errorHtml = `<div style="min-width: 800px; margin: 5px; max-width: 900px;"><div style="background-color: #d32f2f; color: white; text-align: center; font-family: monospace; font-size: 16px;">ERROR</div><div style="padding: 15px; font-family: monospace; white-space: pre-wrap;">${errorMessage}</div><div style="background-color: #d32f2f; color: white; text-align: center; font-family: monospace; font-size: 16px;">ERROR</div></div>`;
                     processedError = errorHtml;
+                }else{
+                    processedError = '';
                 }
 
                 return {
