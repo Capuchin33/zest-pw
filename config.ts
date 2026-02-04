@@ -197,7 +197,9 @@ export async function loadZestConfig(): Promise<Required<ZestConfig>> {
     const userConfig = await import(configPath);
     
     if (userConfig.default) {
-      return userConfig.default;
+      // Update global loadedConfig so getZestConfig() returns the same values
+      loadedConfig = userConfig.default;
+      return loadedConfig;
     }
     
     return loadedConfig;

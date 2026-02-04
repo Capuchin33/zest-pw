@@ -39,6 +39,7 @@ export async function takeScreenshotAfterStep(
       }
       
       // Check if we should only take screenshots on failure
+      // If onlyOnFailure is true, only take screenshot when hasError is explicitly true
       if (config.screenshots.onlyOnFailure && !hasError) {
         return;
       }
