@@ -29,10 +29,15 @@ export async function processTestResults(
   // Add formatted file names to actualResult
   const finalResults = addFileNamesToResults(enrichedResults);
 
+  // Remove screenshot bodies from report if includeInReport is false
+  const resultsForReport = config.screenshots.includeInReport 
+    ? finalResults 
+    : removeScreenshotBodies(finalResults);
+
   // Save JSON report if enabled
   if (config.reporter.saveJsonReport) {
     try {
-      saveTestResultsToJson(finalResults, config.reporter.outputDir);
+      saveTestResultsToJson(resultsForReport, config.reporter.outputDir);
     } catch (error) {
       console.error('Error saving JSON report:', error);
     }
@@ -66,3 +71,32 @@ export async function processTestResults(
   }
 }
 
+/**
+ * Removes screenshot bodies (base64 data) from test results while keeping metadata
+ * This is used when includeInReport is false to reduce JSON file size
+ * @param results - Test results object
+ * @returns Test results with screenshot bodies removed
+ */
+function removeScreenshotBodies(results: any): any {
+  return {
+    ...results,
+    tests: results.tests.map((test: any) => ({
+      ...test,
+      steps: test.steps.map((step: any) => ({
+        ...step,
+        actualResult: step.actualResult?.map((att: any) => {
+          // If it's a screenshot (image/png), remove the body but keep metadata
+          if (att.image === 'image/png') {
+            return {
+              fileName: att.fileName,
+              image: att.image,
+              // body is omitted
+            };
+          }
+          // For other attachments, keep as is
+          return att;
+        }) || []
+      }))
+    }))
+  };
+}

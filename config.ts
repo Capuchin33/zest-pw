@@ -63,6 +63,12 @@ export interface ZestConfig {
      * @default false
      */
     saveToDisk?: boolean;
+
+    /**
+     * Capture full page screenshot (scrolls to capture entire page)
+     * @default true
+     */
+    fullPage?: boolean;
   };
 
   /**
@@ -113,6 +119,7 @@ export const defaultConfig: Required<ZestConfig> = {
     includeInReport: true,
     onlyOnFailure: false,
     saveToDisk: false,
+    fullPage: true,
   },
   zephyr: {
     enabled: false,

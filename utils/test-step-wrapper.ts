@@ -13,10 +13,10 @@ export function wrapTestStepWithScreenshots(
   const originalTestStep: typeof test.step = test.step.bind(test);
   const originalTestStepSkip = test.step.skip.bind(test);
 
-  const takeScreenshot = async (title: string) => {
+  const takeScreenshot = async (title: string, hasError: boolean = false) => {
     const context = getCurrentContext();
     try {
-      await takeScreenshotAfterStep(context.page, context.testInfo, title);
+      await takeScreenshotAfterStep(context.page, context.testInfo, title, hasError);
     } catch (screenshotError) {
       console.error('Error taking screenshot after step error:', screenshotError);
     }
@@ -30,10 +30,10 @@ export function wrapTestStepWithScreenshots(
     return originalTestStep(title, async (stepInfo: TestStepInfo) => {
       try {
         const result = await body(stepInfo);
-        await takeScreenshot(title);
+        await takeScreenshot(title, false);
         return result;
       } catch (error) {
-        await takeScreenshot(title);
+        await takeScreenshot(title, true);
         throw error;
       }
     }, options);
