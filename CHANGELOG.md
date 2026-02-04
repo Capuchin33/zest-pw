@@ -52,6 +52,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - JSDoc comments for all public APIs
 - Examples for common use cases
 
+## [1.0.10] - 2024-12-XX
+
+### Added
+- `screenshots.fullPage` configuration option to control full page vs viewport screenshot capture
+- Full implementation of `screenshots.enabled` configuration option
+- Full implementation of `screenshots.onlyOnFailure` configuration option
+- Full implementation of `screenshots.includeInReport` configuration option
+
+### Fixed
+- Screenshot configuration options now properly control screenshot behavior
+- Screenshots can now be disabled via `screenshots.enabled: false`
+- Screenshots can now be captured only on test failures via `screenshots.onlyOnFailure: true`
+- Screenshot base64 data can now be excluded from JSON reports via `screenshots.includeInReport: false` to reduce file size
+
+### Changed
+- Screenshot capture logic now respects all configuration options
+- JSON report generation now filters screenshot bodies when `includeInReport` is false
+
 ## [Unreleased]
 
 ### Planned
@@ -66,5 +84,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Version History
 
+- **1.0.10** - Screenshot configuration improvements
 - **1.0.0** - Initial stable release
 
