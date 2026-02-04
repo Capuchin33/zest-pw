@@ -1,6 +1,6 @@
 {
   "name": "@zest-pw/test",
-  "version": "1.0.5",
+  "version": "1.0.9",
   "description": "Advanced Playwright test framework with automatic screenshots, custom reporting, and Zephyr Scale integration",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

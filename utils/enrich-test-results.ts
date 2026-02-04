@@ -83,7 +83,7 @@ function getPlannedSteps(test: any): string[] {
  * Combines executed and unexecuted steps
  * @param executedSteps - Array of executed step objects
  * @param plannedSteps - Array of planned step titles
- * @returns Combined array with executed steps and unexecuted steps marked as 'In Progress'
+ * @returns Combined array with executed steps and unexecuted steps marked as 'Not Executed'
  */
 function combineSteps(executedSteps: any[], plannedSteps: string[]): any[] {
   const executedStepTitles = executedSteps.map((step: any) => step.stepTitle);
@@ -94,7 +94,7 @@ function combineSteps(executedSteps: any[], plannedSteps: string[]): any[] {
     ...notExecutedSteps.map((stepTitle: string) => ({
       stepTitle: stepTitle,
       actualResult: [],
-      statusName: 'In Progress'
+      statusName: 'Not Executed'
     }))
   ];
 }

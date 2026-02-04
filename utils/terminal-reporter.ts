@@ -37,7 +37,7 @@ export function printTestResults(result: any): void {
           break;
           case 'fail': failedCount++; 
           break;
-          case 'In Progress': skippedCount++; 
+          case 'Not Executed': skippedCount++; 
           break;
         }
       }
@@ -55,7 +55,7 @@ export function printTestResults(result: any): void {
 function printTestSteps(allSteps: any[], testTitle: string, outputDir?: string): void {
   console.log('');
   allSteps.forEach((step: any, stepIndex: number) => {
-    if (step.statusName === 'In Progress') {
+    if (step.statusName === 'Not Executed') {
       return;
     }
     let stepTitle: string;

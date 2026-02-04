@@ -39,15 +39,26 @@ export async function getResultsFromJson() {
         const { projectName, testTitle, testCaseKey, ...testData } = test;
         acc[testCaseKey] = {
             ...testData,
-            steps: test.steps.map(({ stepTitle, actualResult, ...step }) => {
+            steps: test.steps.map(({ stepTitle, actualResult, error, ...step }) => {
                 let processedActualResult = actualResult;
+                let processedError = error;
                 if (actualResult && Array.isArray(actualResult)) {
                     processedActualResult = actualResult.map(item => {
-                        return `<img src="data:${item.image || ''};base64,${item.body || ''}" alt="${item.fileName || ''}">`;
+                        return `<img src="data:${item.image || ''};base64,${item.body || ''}" alt="${item.fileName || ''}" style="margin-left: 0!important; max-width: 900px;">`;
                     }).join('');
                 }
+                if (error) {
+                    let cleanMessage = error.message.replace(/\x1b\[[0-9;]*m/g, '');
+                    cleanMessage = cleanMessage.split('Call log:')[0].trim();
+                    const errorMessage = cleanMessage.split('\n').map(line => line.trimStart()).join('<br>');
+                    const errorHtml = `<div style="min-width: 800px; margin: 5px; max-width: 900px;"><div style="background-color: #d32f2f; color: white; text-align: center; font-family: monospace; font-size: 16px;">ERROR</div><div style="padding: 15px; font-family: monospace; white-space: pre-wrap;">${errorMessage}</div><div style="background-color: #d32f2f; color: white; text-align: center; font-family: monospace; font-size: 16px;">ERROR</div></div>`;
+                    processedError = errorHtml;
+                }else{
+                    processedError = '';
+                }
+
                 return {
-                    actualResult: processedActualResult,
+                    actualResult: processedError + '\n' + processedActualResult,
                     ...step
                 };
             })
