@@ -262,6 +262,35 @@ test('TC-001: Test description', async ({ page }) => {
 });
 ```
 
+### Custom Fixtures (Screenshots Still Work)
+
+If you need custom fixtures, extend the exported `test` from `@zest-pw/test`.
+Automatic screenshots after `test.step()` will continue to work.
+
+```typescript
+import { test as base, expect } from '@zest-pw/test';
+
+type MyFixtures = {
+  userRole: string;
+};
+
+export const test = base.extend<MyFixtures>({
+  userRole: async ({}, use) => {
+    await use('admin');
+  },
+});
+
+test('TC-001: Uses custom fixture', async ({ page, userRole }) => {
+  await test.step('Open page', async () => {
+    await page.goto('https://playwright.dev/');
+  });
+
+  await test.step('Assert role', async () => {
+    await expect(userRole).toBe('admin');
+  });
+});
+```
+
 ### Test Naming Convention
 
 Name your test files with test case keys for Zephyr integration:

@@ -15,6 +15,10 @@ export function wrapTestStepWithScreenshots(
 
   const takeScreenshot = async (title: string, hasError: boolean = false) => {
     const context = getCurrentContext();
+    if (!context) {
+      return;
+    }
+
     try {
       await takeScreenshotAfterStep(context.page, context.testInfo, title, hasError);
     } catch (screenshotError) {
